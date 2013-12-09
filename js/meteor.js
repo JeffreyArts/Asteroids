@@ -101,6 +101,11 @@ jQuery.fn.crSpaceship = function($spaceship, $size) {
 		$($spaceship).css("width",$game['objects'][$spaceship]['width']);
 		$($spaceship).css("height",$game['objects'][$spaceship]['height']);
 
+
+		$game['objects'][$spaceship]['speed']	= 3;
+		$game['objects'][$spaceship]['vspeed']	= 0;
+		$game['objects'][$spaceship]['hspeed'] 	= 0;
+		$game['objects'][$spaceship]['direction'] 	= 0;
 		$param['min_speed'] = 1;
 		$param['max_speed'] = 12;
 
@@ -157,36 +162,65 @@ jQuery.fn.objSpaceship = function($obj,$param) {
 
 
     setInterval(function(){
+
+    	  // Turn the ship
+    	if ($param['turn']) {
+			$game['objects'][$obj]['direction'] = $game['objects'][$obj]['direction']+$param['turn_speed'];
+    	}
+
+
+		  // Slow down
+	   	if ($game['objects'][$obj]['slow_down']) {
+	       	if ($game['objects'][$obj]['speed'] > $param['min_speed']) {
+	       		$game['objects'][$obj]['speed'] -= $game['objects'][$obj]['slow_down_speed'];
+	       	} else {
+	       		$game['objects'][$obj]['speed'] = $param['min_speed'];
+	       	}
+	   	}
+	
+		  // Speed up
+	   	if ($game['objects'][$obj]['speed_up']) {
+	       	if ($game['objects'][$obj]['speed'] < $param['max_speed']) {
+	       		$game['objects'][$obj]['speed'] +=0.25;
+	       	} else {
+	       		$game['objects'][$obj]['speed'] = $param['max_speed'];
+	       	}
+	   	}
+
+
+
 	    $(this).wrap($obj);
-	    // Slow down
-    	if ($game['objects'][$obj]['slow_down']) {
-        	if ($game['objects'][$obj]['speed'] > $param['min_speed']) {
-        		$game['objects'][$obj]['speed'] -= $game['objects'][$obj]['slow_down_speed'];
-        	} else {
-        		$game['objects'][$obj]['speed'] = $param['min_speed'];
-        	}
-    	}
-
-	    // Speed up
-    	if ($game['objects'][$obj]['speed_up']) {
-        	if ($game['objects'][$obj]['speed'] < $param['max_speed']) {
-        		$game['objects'][$obj]['speed'] +=0.25;
-        	} else {
-        		$game['objects'][$obj]['speed'] = $param['max_speed'];
-        	}
-    	}
-        
-
-        $($obj).css("top","-="+$game['objects'][$obj]['speed']);
-        
+	    $(this).move($obj);
+		$(this).direction($obj,$game['objects'][$obj]['direction']);
+		$($obj).rotate($game['objects'][$obj]['direction']+90);
+	    
     }, 30);
 ////	END OF interval 	///////////////////////////////////////////////////////////
     
     // Pressing the UP key increase speed
 	$(document).keydown(function(e) {
 		if ( e.which == 38) {
-			$game['objects'][$obj]['slow_down'] = false;
 			$game['objects'][$obj]['speed_up'] = true;
+		}
+	});
+    
+    
+    // Pressing the RIGHT key change direction to right (+)
+	$(document).keydown(function(e) {
+		if ( e.which == 39) {
+			$param['turn'] = true;
+			$param['turn_speed'] = 6;
+			$game['objects'][$obj]['direction'] += $param['turn_speed'];
+		}
+	});
+    
+    
+    // Pressing the LEFT key change direction to left (-)
+	$(document).keydown(function(e) {
+		if ( e.which == 37) {
+			$param['turn'] = true;
+			$param['turn_speed'] = -6;
+			$game['objects'][$obj]['direction'] += $param['turn_speed'];
 		}
 	});
     
@@ -201,16 +235,108 @@ jQuery.fn.objSpaceship = function($obj,$param) {
 	});
     
     
+    
+    // Releasing the RIGHT or LEFT key to stop turning
+	$(document).keyup(function(e) {
+		if ( e.which == 39) {
+			$param['turn'] = false;
+		}
+	});
+    
+    
+    
+    // Releasing the RIGHT or LEFT key to stop turning
+	$(document).keyup(function(e) {
+		if ( e.which == 37) {
+			$param['turn'] = false;
+		}
+	});
+    
+    
     // Pressing the DOWN key decrease speed (FAST)
 	$(document).keydown(function(e) {
 		if ( e.which == 40) {
-			$game['objects'][$obj]['slow_down'] = true;
-			$game['objects'][$obj]['speed_up'] = false;
-			$game['objects'][$obj]['slow_down_speed'] += $game['objects'][$obj]['speed']/50;
+			$game['objects'][$obj]['speed'] -= 1;
 		}
 	});
 	
 };
+
+
+
+/*
+*	- Direction function -
+*	This function takes gives
+*
+* 	$obj = id of the targetted element. (ex. "#meteor1")
+*  
+ */
+jQuery.fn.direction = function($obj, $degrees) {
+    //Load the general variable into a local var for better readability
+    $speed = $game['objects'][$obj]['speed'];
+	while ($degrees>=360) {
+		$degrees-=360;
+	}
+	$radians = $degrees * (Math.PI/180)
+
+	$hspeed = $speed*Math.cos($radians);
+	$vspeed = $speed*Math.sin($radians);
+	//$new_direction = $direction*Math.atan2($game['objects'][$obj]['vspeed'], $game['objects'][$obj]['hspeed'])
+
+	$game['objects'][$obj]['hspeed'] = $hspeed;
+	$game['objects'][$obj]['vspeed'] = $vspeed;
+
+	$(this).gamelog("hspeed "+$hspeed+" | vspeed "+$vspeed+" | radians "+$radians+" | speed "+$speed+"|  d"+$degrees);
+
+}
+
+
+
+
+
+/*
+*	- Game log function -
+*	This function adds a log to the .log class
+*
+* 	[string] $data	= The data you want to log. 
+*  
+ */
+window.log_id = 0; // This is the general log id
+jQuery.fn.gamelog = function($data) {
+
+	window.log_id+=1;
+	$(".log ul").before("<li id='id"+window.log_id+"'>"+$data+"</li>");
+	if (window.log_id >= 20) {
+		tmp = window.log_id-20;
+		$("#id"+tmp).remove();
+	}
+
+}
+
+
+
+/*
+*	- Move function -
+*	This function takes gives
+*
+* 	$obj = id of the targetted element. (ex. "#meteor1")
+*  
+ */
+jQuery.fn.move = function($obj) {
+
+    //Load the general variables into a local var for better readability
+    $hspeed = $game['objects'][$obj]['hspeed'];
+    $vspeed = $game['objects'][$obj]['vspeed'];
+
+    $($obj).css("top","+="+$vspeed);
+    $($obj).css("left","+="+$hspeed);
+
+
+	$game['objects'][$obj]['x'] = $($obj).offset().left;
+	$game['objects'][$obj]['y'] = $($obj).offset().top;
+
+
+}
 
 
 
@@ -236,7 +362,7 @@ jQuery.fn.wrap = function($obj) {
     if ($($obj).offset().top>$wrapping['bottom']) {
         $($obj).css("top","-="+$wrapping['bottom']);
     }
-    if ($($obj).offset().top<=$wrapping['top']) {
+    if ($($obj).offset().top<=$wrapping['top']+$game['objects'][$obj]['width']) {
         $($obj).css("top","+="+$wrapping['bottom']);
     }
 
