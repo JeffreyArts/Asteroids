@@ -1,0 +1,101 @@
+<html>
+<head>
+    <title>Test</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://www.horloge.nl/js/jQueryRotateCompressed-2-1.js" ></script>
+    <script src="js/meteor.js"></script>
+</head>
+<style>
+.game>span { display: block; position: relative}
+.game>span .part       { display:block;position:absolute;visibility: visible}
+
+.h1             { border-right: 10px solid; border-top: 10px solid transparent; }
+.h2             { border-left: 10px solid #f00; border-top: 10px solid transparent; }
+.h3             { border-left: 10px solid #f00; border-bottom: 10px solid transparent; }
+.h4             { border-right: 10px solid #f00; border-bottom: 10px solid transparent; }
+.h5             { border-top: 5px solid #f00; border-right: 5px solid #f00; border-bottom: 5px solid #f00; border-left: 5px solid #f00; }
+
+.d1.h1, .d1.h4  {border-right-color:#ddd;}
+.d1.h2, .d1.h3  {border-left-color:#ddd;}
+.d1.h5           {border-color: #ddd;}
+
+
+.d2.h1, .d2.h4  {border-right-color:#bbb;}
+.d2.h2, .d2.h3  {border-left-color:#bbb;}
+.d2.h5          {border-color: #bbb #999 #999 #bbb;}
+
+.d3.h1, .d3.h4  {border-right-color:#999;}
+.d3.h2, .d3.h3  {border-left-color:#999;}
+.d3.h5          {border-color:#999;}
+
+.d4.h1, .d4.h4  {border-right-color:#666;}
+.d4.h2, .d4.h3  {border-left-color:#666;}
+.d4.h5          {border-color:#666;}
+
+
+.d5.h1, .d5.h4  {border-right-color:#333;}
+.d5.h2, .d5.h3  {border-left-color:#333;}
+
+
+#s1             { left:0;top:0; }
+#s2             { left:10px;top:0; }
+#s3             { left:20px;top:0; }
+#s4             { left:0;top:10px; }
+#s5             { left:10px;top:10px; }
+#s6             { left:20px;top:10px; }
+#s7             { left:30px;top:10px; }
+#s5             { left:40px;top:10px; }
+#s6             { left:0;top:20px; }
+#s7             { left:40px;top:20px; }
+#s8             { left:40px;top:30px; }
+#s9             { left:10px;top:40px; }
+#s10            { left:20px;top:40px; }
+#s11            { left:30px;top:40px; }
+#s0                { left:10px;top:10px; }
+
+.game           { border: 1px solid #777; float: left; height: 480px; left: 25%; position: absolute; top: 50px; width: 50%;overflow: hidden; background-color:#333;}
+</style>
+
+<body>
+<div class="game">
+
+    <!--
+    <span class="meteor">
+        <b class='part h1 d1' id="s1"></b>
+        <b class='part h4 d1' id="s2"></b>
+        <b class='part h2 d1' id="s2"></b>
+        <b class='part h2 d1' id="s3"></b>
+        <b class='part h3 d1' id="s4"></b>
+        <b class='part h1 d1' id="s4"></b>
+        <b class='part h5 d2' id="s5"></b>
+        <b class='part h5 d2' id="s6"></b>
+        <b class='part h5 d2' id="s7"></b>
+        <b class='part h3 d2' id="s8"></b>
+        <b class='part h4 d2' id="s9"></b>
+        <b class='part h5 d2' id="s10"></b>
+        <b class='part h5 d2' id="s11"></b>
+    </span>-->
+    <span class="spaceship" id="spaceship"></span>
+</div>
+<div id="images"></div>
+
+.
+<script>//$(".meteor").rotate(45);
+//         alert( "Hello, World!");
+
+$(document).ready(function () {
+   $(document).setGameConfig(".game");
+
+   $(document).crMeteor("#meteor1",10);
+   $(document).crMeteor("#meteor2",10);
+   $(document).crMeteor("#meteor3",10);
+   $(document).crMeteor("#meteor4",10);
+   $(document).crMeteor("#meteor5",10);
+   $(document).crSpaceship("#spaceship",10);
+
+});
+
+</script>
+
+</body>
+</html>

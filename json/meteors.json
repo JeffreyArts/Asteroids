@@ -1,0 +1,161 @@
+{
+"meteors": {
+	"meteor1": {
+		"row1": 
+		{
+			"column1": [{"specs": "part h1 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{}],
+			"column5": [{}]
+		}
+		,"row2":
+		{
+			"column1": [{"specs": "part h5 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h5 d1"}]
+		}
+		,"row3":
+		{
+			"column1": [{"specs": "part h5 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h5 d1"}]
+		}
+		,"row4":
+		{
+			"column1": [{"specs": "part h5 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h3 d1"}]
+		}
+		,"row5":
+		{
+			"column1": [{}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{}]
+		}
+	 },"meteor2": {
+		"row1": 
+		{
+			"column1": [{"specs": "part h1 d1"}],
+			"column2": [{"specs": "part h2 d1"}],
+			"column3": [{"specs": "part h1 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h2 d1"}]
+		}
+		,"row2":
+		{
+			"column1": [{"specs": "part h5 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h3 d1"}]
+		}
+		,"row3":
+		{
+			"column1": [{"specs": "part h4 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h5 d1"}]
+		}
+		,"row4":
+		{
+			"column1": [{}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h3 d1"}]
+		}
+		,"row5":
+		{
+			"column1": [{}],
+			"column2": [{"specs": "part h4 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{}]
+		}
+	 },"meteor3": {
+		"row1": 
+		{
+			"column1": [{}],
+			"column2": [{"specs": "part h2 d1"}],
+			"column3": [{}],
+			"column4": [{"specs": "part h1 d1"}],
+			"column5": [{"specs": "part h5 d1"}]
+		}
+		,"row2":
+		{
+			"column1": [{"specs": "part h1 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h5 d1"}]
+		}
+		,"row3":
+		{
+			"column1": [{"specs": "part h5 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h3 d1"}]
+		}
+		,"row4":
+		{
+			"column1": [{"specs": "part h5 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h5 d1"}],
+			"column5": [{"specs": "part h2 d1"}]
+		}
+		,"row5":
+		{
+			"column1": [{"specs": "part h4 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h4 d1"}],
+			"column5": [{"specs": "part h3 d1"}]
+		}
+	 }
+},
+"spaceship": {
+		"row1": 
+		{
+			"column1": [{}],
+			"column2": [{"specs": "part h1 d1"}],
+			"column3": [{"specs": "part h2 d1"}],
+			"column4": [{}]
+		}
+		,"row2":
+		{
+			"column1": [{}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{}]
+		}
+		,"row3":
+		{
+			"column1": [{"specs": "part h1 d1"}],
+			"column2": [{"specs": "part h5 d1"}],
+			"column3": [{"specs": "part h5 d1"}],
+			"column4": [{"specs": "part h2 d1"}]
+		}
+		,"row4":
+		{
+			"column1": [{"specs": "part h5 d1"}],
+			"column2": [{}],
+			"column3": [{}],
+			"column4": [{"specs": "part h5 d1"}]
+		}
+	 
+}
+}
+
+
