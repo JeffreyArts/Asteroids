@@ -127,6 +127,12 @@ jQuery.fn.crSpaceship = function($spaceship, $size) {
 };
 
 
+
+jQuery.fn.crBullet = function($bullet,$x,$y,$direction) {
+	$( "<b>" ).attr( "class", "bullet" ).css( "left",$x ).css( "top",$y ).appendTo( $game['canvas'] );
+};
+
+
 jQuery.fn.setGameConfig = function($canvas) {	
 	$play=true;
 	$game = {};
@@ -152,12 +158,6 @@ jQuery.fn.setGameConfig = function($canvas) {
 
 jQuery.fn.objMeteor = function($obj) {
     
-    	//Canvas Warpping - These parameters are set outside the interval, they ARE NESCESSARY !!!
-    $wrapping = [];
-    $wrapping['top'] = -$game['objects'][$obj]['height']/2;
-    $wrapping['bottom'] = $game['height']+($game['objects'][$obj]['height']/2);
-    $wrapping['left'] = $game['posX']-$game['objects'][$obj]['width']/2;
-    $wrapping['right'] = $game['width']+($game['objects'][$obj]['width']/2);
     $game['objects'][$obj]['rotate'] = Math.round(Math.random()*360);
 
 
@@ -171,8 +171,6 @@ jQuery.fn.objMeteor = function($obj) {
 
 		$game['objects'][$obj]['rotate'] ++;
 		$($obj).rotate($game['objects'][$obj]['rotate'] );
-       	//$($obj).css("left","+="+$param['left']);
-        //$($obj).css("top","+="+$param['top']);
     },  $game['speed']);
 ////	END OF interval 	///////////////////////////////////////////////////////////
 
@@ -231,8 +229,11 @@ jQuery.fn.objSpaceship = function($obj) {
 ////	END OF interval 	///////////////////////////////////////////////////////////
 
 
-    
-    // Pressing the UP key increase speed
+//////////////////////////////////////
+///	KEY PRESS EVENTS
+//////////////////////////////////////
+
+    // UP key - increase speed
 	$(document).keydown(function(e) {
 		if ( e.which == 38) {
 			$game['objects'][$obj]['speed_up'] = true;
@@ -240,7 +241,7 @@ jQuery.fn.objSpaceship = function($obj) {
 	});
     
     
-    // Pressing the RIGHT key change direction to right (+)
+    // RIGHT key - change direction to right (+)
 	$(document).keydown(function(e) {
 		if ( e.which == 39) {
 			$param['turn'] = true;
@@ -250,7 +251,15 @@ jQuery.fn.objSpaceship = function($obj) {
 	});
     
     
-    // Pressing the LEFT key change direction to left (-)
+    // DOWN key - decrease speed (FAST)
+	$(document).keydown(function(e) {
+		if ( e.which == 40) {
+			$game['objects'][$obj]['speed'] -= 1;
+		}
+	});
+    
+    
+    // LEFT key - change direction to left (-)
 	$(document).keydown(function(e) {
 		if ( e.which == 37) {
 			$param['turn'] = true;
@@ -260,7 +269,22 @@ jQuery.fn.objSpaceship = function($obj) {
 	});
     
     
-    // Releasing the UP key decrease speed
+    // SPACE - fire bullet
+	$(document).keydown(function(e) {
+		if ( e.which == 32) {
+	    	$(this).crBullet("#bullet1",$game['objects'][$obj]['x'],$game['objects'][$obj]['y'],$game['objects'][$obj]['direction']);
+			$param['turn'] = true;
+			$param['turn_speed'] = -6;
+			$game['objects'][$obj]['direction'] += $param['turn_speed'];
+		}
+	});
+    
+
+//////////////////////////////////////
+///	KEY RELEASE EVENTS
+//////////////////////////////////////
+    
+    // UP key - decrease speed
 	$(document).keyup(function(e) {
 		if ( e.which == 38) {
 			$game['objects'][$obj]['speed_up'] = false;
@@ -271,7 +295,7 @@ jQuery.fn.objSpaceship = function($obj) {
     
     
     
-    // Releasing the RIGHT or LEFT key to stop turning
+    // RIGHT key - stop turning
 	$(document).keyup(function(e) {
 		if ( e.which == 39) {
 			$param['turn'] = false;
@@ -280,18 +304,10 @@ jQuery.fn.objSpaceship = function($obj) {
     
     
     
-    // Releasing the RIGHT or LEFT key to stop turning
+    // LEFT key - stop turning
 	$(document).keyup(function(e) {
 		if ( e.which == 37) {
 			$param['turn'] = false;
-		}
-	});
-    
-    
-    // Pressing the DOWN key decrease speed (FAST)
-	$(document).keydown(function(e) {
-		if ( e.which == 40) {
-			$game['objects'][$obj]['speed'] -= 1;
 		}
 	});
 	
@@ -307,17 +323,9 @@ jQuery.fn.runGame = function($canvas) {
    		} else if (k.indexOf("spaceship") == 1) {
    			$(document).objSpaceship(k);
    		} else {
-   		// Systeem kent dit object niet
+   		// Error - Object doesn't exists
    		}
 	}
-
-////	START interval 	///////////////////////////////////////////////////////////
-    setInterval(function(){    	
-
-
-    },  $game['speed']);
-////	END OF interval 	///////////////////////////////////////////////////////////
-
 }
 
 
