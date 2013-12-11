@@ -6,7 +6,7 @@
     <script src="js/meteor.js"></script>
 </head>
 <style>
-.game>span { display: block; position: relative}
+.game>span { display: block; position: absolute}
 .game>span .part       { display:block;position:absolute;visibility: visible}
 
 .h1             { border-right: 10px solid; border-top: 10px solid transparent; }
@@ -35,7 +35,10 @@
 
 .d5.h1, .d5.h4  {border-right-color:#333;}
 .d5.h2, .d5.h3  {border-left-color:#333;}
-
+#meteor1  { left:300px; top:220px;}
+#meteor1 .part {
+    border-color: #00FF00;
+}
 
 #s1             { left:0;top:0; }
 #s2             { left:10px;top:0; }
@@ -53,7 +56,7 @@
 #s11            { left:30px;top:40px; }
 #s0                { left:10px;top:10px; }
 
-.game           { border: 1px solid #777; float: left; height: 480px; left: 25%; position: absolute; top: 50px; width: 50%;overflow: hidden; background-color:#333;}
+.game           { border: 1px solid #777; float: left; height: 480px; left: 25%; position: absolute; top: 50px; width: 970px;overflow: hidden; background-color:#333;}
 </style>
 
 <body>
