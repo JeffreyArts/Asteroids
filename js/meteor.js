@@ -61,7 +61,6 @@ jQuery.fn.crMeteor = function($meteor, $size) {
 	    $game['objects'][$meteor]['wrapping']['right']	=  $game['width']+($game['objects'][$meteor]['width']/2);
 
 		$game['objects'][$meteor]['speed']		= Math.random()*8+2;
-		$game['objects'][$meteor]['speed']		= 0;
 		$game['objects'][$meteor]['vspeed']		= 0;
 		$game['objects'][$meteor]['hspeed'] 	= 0;
 		$game['objects'][$meteor]['direction'] 	= Math.random()*360;
@@ -106,6 +105,9 @@ jQuery.fn.crSpaceship = function($spaceship, $size) {
 		//$param['key']['power'] = 38;
 	        
 		$game['objects'][$spaceship]['height'] = $size*$y;
+		$($spaceship).css("left",$game['width']/2);
+		$($spaceship).css("top",$game['height']/2);
+		
 		
 		// Set spaceship sizes
 		$($spaceship).css("width",$game['objects'][$spaceship]['width']);
@@ -129,7 +131,20 @@ jQuery.fn.crSpaceship = function($spaceship, $size) {
 
 
 jQuery.fn.crBullet = function($bullet,$x,$y,$direction) {
-	$( "<b>" ).attr( "class", "bullet" ).css( "left",$x ).css( "top",$y ).appendTo( $game['canvas'] );
+		
+	$game['objects'][$bullet] = {};
+	$game['objects'][$bullet]['x'] = $x;
+	$game['objects'][$bullet]['y'] = $y;
+	//Create bullet element (NOTE: replace the # so the id is correct)
+	$( "<b>" ).attr( "class", "bullet" ).attr( "id",$bullet.replace("#", "")).css( "left",$x ).css( "top",$y ).appendTo( $game['canvas'] ).hide();
+	$($bullet).fadeIn("fast");
+	$game['objects'][$bullet]['speed']		= 16;
+	$game['objects'][$bullet]['vspeed']		= 0;
+	$game['objects'][$bullet]['hspeed'] 	= 0;
+	$game['objects'][$bullet]['direction'] 	= $direction;
+
+
+   	$().objBullet($bullet);
 };
 
 
@@ -143,7 +158,8 @@ jQuery.fn.setGameConfig = function($canvas) {
 	$game['width']	= $($canvas).width();
 	$game['height']	= $($canvas).height()
 	$game['posX']	= 0;
-	$game['posY']	= $($canvas).offset().top;
+	$game['posY']	= 0;
+	$game['bullet']	= 0;
 	$game['standard']['speed']	= 10;
 };
 
@@ -162,7 +178,7 @@ jQuery.fn.objMeteor = function($obj) {
 
 
 ////	START interval 	///////////////////////////////////////////////////////////
-    setInterval(function(){    	
+    $game['objects'][$obj]['interval'] = setInterval(function(){    	
 
 
 	    $(this).wrap($obj);
@@ -178,6 +194,37 @@ jQuery.fn.objMeteor = function($obj) {
 
 };
 
+jQuery.fn.objBullet = function($obj) {
+		$($obj).rotate($game['objects'][$obj]['direction']+90);
+////	START interval 	///////////////////////////////////////////////////////////
+    $game['objects'][$obj]['interval'] = setInterval(function(){    	
+
+	    $(this).move($obj);
+		$(this).direction($obj,$game['objects'][$obj]['direction']);
+
+
+    	
+	   	//Check collision
+	   	for (var $with in $game.objects) {
+	   		if ($with.indexOf("meteor") == 1) {
+    			// Set game.lives -1
+    			if ($().collisionCheck($obj,$with)) {
+    				alert($with+" - "+$obj);
+    			}
+	   		} 
+		}
+
+		if ($game['objects'][$obj]['x']<$game['posX'] || $game['objects'][$obj]['x']>$game['width'] || $game['objects'][$obj]['y']<$game['posY'] || $game['objects'][$obj]['y']>$game['height']) {
+			$($obj).deleteObject($obj);
+		}
+
+    },  $game['speed']);
+////	END OF interval 	///////////////////////////////////////////////////////////
+
+
+
+};
+
 
 jQuery.fn.objSpaceship = function($obj) {
     
@@ -185,7 +232,7 @@ jQuery.fn.objSpaceship = function($obj) {
 	$param = {};
 
 ////	START interval 	///////////////////////////////////////////////////////////
-    setInterval(function(){
+    $game['objects'][$obj]['interval'] = setInterval(function(){
 
     	  // Turn the ship
     	if ($param['turn']) {
@@ -214,7 +261,8 @@ jQuery.fn.objSpaceship = function($obj) {
 	   	//Check collision
 	   	for (var $with in $game.objects) {
 	   		if ($with.indexOf("meteor") == 1) {
-    			$().gamelog($().collisionCheck("#spaceship",$with));
+    			// Set game.lives -1
+    			$().collisionCheck("#spaceship",$with);
 	   		} 
 		}
 
@@ -272,11 +320,13 @@ jQuery.fn.objSpaceship = function($obj) {
     // SPACE - fire bullet
 	$(document).keydown(function(e) {
 		if ( e.which == 32) {
-	    	$(this).crBullet("#bullet1",$game['objects'][$obj]['x'],$game['objects'][$obj]['y'],$game['objects'][$obj]['direction']);
-			$param['turn'] = true;
-			$param['turn_speed'] = -6;
-			$game['objects'][$obj]['direction'] += $param['turn_speed'];
-		}
+	    	$game['bullet']++;
+			$radians = $game['objects'][$obj]['direction'] * (Math.PI/180)
+			$new_y = $game['objects'][$obj]['y']+10;
+			$new_x = $game['objects'][$obj]['x']+15;
+	    	$(this).crBullet("#bullet"+$game['bullet'],$new_x,$new_y,$game['objects'][$obj]['direction']);		
+
+	    }
 	});
     
 
@@ -403,6 +453,27 @@ jQuery.fn.gamelog = function($data) {
 
 
 
+
+
+/*
+*	- Delete function -
+*	This function deletes the object
+*
+* 	[object] $obj	= The object (id) which needs to be deleted 
+*  
+ */
+jQuery.fn.deleteObject = function($obj) {
+
+	$($obj).remove();
+	if ($game['objects'][$obj]['interval'] >0) {
+		clearInterval($game['objects'][$obj]['interval']);
+	}
+	delete $game['objects'][$obj];
+
+}
+
+
+
 /*
 *	- Move function -
 *	This function takes gives
@@ -416,11 +487,14 @@ jQuery.fn.move = function($obj) {
     $hspeed = $game['objects'][$obj]['hspeed'];
     $vspeed = $game['objects'][$obj]['vspeed'];
 
+
+
     $($obj).css("top","+="+$vspeed);
     $($obj).css("left","+="+$hspeed);
 
     $game['objects'][$obj]['x'] = parseInt($($obj).css("left").replace("px",""),0);
     $game['objects'][$obj]['y'] = parseInt($($obj).css("top").replace("px",""),0);
+
 }
 
 
@@ -481,6 +555,7 @@ jQuery.fn.collisionCheck = function($obj,$with) {
     } else {
         return ("x: "+$game['objects'][$obj]['x']+"\ny: "+$game['objects'][$obj]['y']+"\n--------------\nx: "+$game['objects'][$with]['x']+"\ny: "+$game['objects'][$with]['y'])
     }
+    
 /*
 	for (var $target in $game.objects) {
    		if (k.indexOf("meteor") == 1) {
