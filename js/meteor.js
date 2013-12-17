@@ -141,6 +141,8 @@ jQuery.fn.crBullet = function($bullet,$x,$y,$direction) {
 	$game['objects'][$bullet]['speed']		= 16;
 	$game['objects'][$bullet]['vspeed']		= 0;
 	$game['objects'][$bullet]['hspeed'] 	= 0;
+	$game['objects'][$bullet]['width'] 		= 3;
+	$game['objects'][$bullet]['height'] 	= 3;
 	$game['objects'][$bullet]['direction'] 	= $direction;
 
 
@@ -207,9 +209,9 @@ jQuery.fn.objBullet = function($obj) {
 	   	//Check collision
 	   	for (var $with in $game.objects) {
 	   		if ($with.indexOf("meteor") == 1) {
-    			// Set game.lives -1
     			if ($().collisionCheck($obj,$with)) {
-    				alert($with+" - "+$obj);
+    				alert("HIT!");
+    				$($obj).deleteObject($obj);
     			}
 	   		} 
 		}
@@ -261,8 +263,9 @@ jQuery.fn.objSpaceship = function($obj) {
 	   	//Check collision
 	   	for (var $with in $game.objects) {
 	   		if ($with.indexOf("meteor") == 1) {
-    			// Set game.lives -1
-    			$().collisionCheck("#spaceship",$with);
+    			if ($().collisionCheck("#spaceship",$with)) {
+    				// Set game.lives -1
+    			}
 	   		} 
 		}
 
@@ -539,21 +542,23 @@ jQuery.fn.collisionCheck = function($obj,$with) {
     //Set the wrapping
     
     // Set $obj sizes 
-    $obj_left	= $game['objects'][$obj]['x']-$game['objects'][$obj]['width']/2;
-    $obj_right	= $game['objects'][$obj]['x']+$game['objects'][$obj]['width']/2;
-    $obj_top 	= $game['objects'][$obj]['y']-$game['objects'][$obj]['height']/2;
-    $obj_bottom	= $game['objects'][$obj]['y']+$game['objects'][$obj]['height']/2;
+    var $obj_left	= $game['objects'][$obj]['x']-$game['objects'][$obj]['width']/2;
+    var $obj_right	= $game['objects'][$obj]['x']+$game['objects'][$obj]['width']/2;
+    var $obj_top 	= $game['objects'][$obj]['y']-$game['objects'][$obj]['height']/2;
+    var $obj_bottom	= $game['objects'][$obj]['y']+$game['objects'][$obj]['height']/2;
 
     // Set $with sizes 
-    $with_left	= $game['objects'][$with]['x']-$game['objects'][$with]['width']/2;
-    $with_right = $game['objects'][$with]['x']+$game['objects'][$with]['width']/2;
-    $with_top 	= $game['objects'][$with]['y']-$game['objects'][$with]['height']/2;
-    $with_bottom= $game['objects'][$with]['y']+$game['objects'][$with]['height']/2;
+    var $with_left	= $game['objects'][$with]['x']-$game['objects'][$with]['width']/2;
+    var $with_right = $game['objects'][$with]['x']+$game['objects'][$with]['width']/2;
+    var $with_top 	= $game['objects'][$with]['y']-$game['objects'][$with]['height']/2;
+    var $with_bottom= $game['objects'][$with]['y']+$game['objects'][$with]['height']/2;
     
     if ($obj_right>$with_left && $obj_left<$with_right && $obj_top<$with_bottom && $obj_bottom>$with_top) {
-    	return "HIT!";
+       	//return "HIT!";
+       	return true;
     } else {
-        return ("x: "+$game['objects'][$obj]['x']+"\ny: "+$game['objects'][$obj]['y']+"\n--------------\nx: "+$game['objects'][$with]['x']+"\ny: "+$game['objects'][$with]['y'])
+        //return ("x: "+$game['objects'][$obj]['x']+"\ny: "+$game['objects'][$obj]['y']+"\n--------------\nx: "+$game['objects'][$with]['x']+"\ny: "+$game['objects'][$with]['y'])
+        return false;
     }
     
 /*
