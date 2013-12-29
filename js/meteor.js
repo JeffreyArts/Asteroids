@@ -30,7 +30,34 @@ jQuery.fn.crMeteor = function($meteor, $size,$posX = false, $posY=false, $direct
 	        $.each( $column, function( $key, $part ) {
 	            
 	            $arr[$y][$x]=$i;
-	             $( "<b>" ).attr( "class", $part[0].specs ).css( "left",$x*$size ).css( "top",$y*$size ).appendTo( $meteor );
+	            $id = ($meteor+$y+$x).replace("#","");
+	             $( "<b>" ).attr( "class", $part[0].specs ).css( "left",$x*$size ).css( "top",$y*$size ).attr( "id", $id ).appendTo( $meteor );
+
+				// Adjust the border sizes
+					//Top
+				$border_top_width = $("#"+$id).css("border-top-width").replace("px","");
+				$("#"+$id).css("border-top-width",$border_top_width/10*$size);
+
+					//Bottom
+				$border_bottom_width = $("#"+$id).css("border-bottom-width").replace("px","");
+				$("#"+$id).css("border-bottom-width",$border_bottom_width/10*$size);
+
+					//Left
+				$border_left_width = $("#"+$id).css("border-left-width").replace("px","");
+				$("#"+$id).css("border-left-width",$border_left_width/10*$size);
+
+					//Right
+				$border_right_width = $("#"+$id).css("border-right-width").replace("px","");
+				$("#"+$id).css("border-right-width",$border_right_width/10*$size);
+
+				// [i] 10 is the standard size as mentioned in the stylesheet
+				// 
+					/*alert(
+						"Top:" + $($meteor+$y+$x ).css("border-top-width") + "\n"+
+						"Right:" + $("#").css("border-right-width") + "\n"+
+						"Bottom:" + $("#").css("border-bottom-width") + "\n"+
+						"Left:" + $("#").css("border-left-width") + "\n"
+						);*/
 	            $x++;
 	            $i++;
 	        });
@@ -70,10 +97,15 @@ jQuery.fn.crMeteor = function($meteor, $size,$posX = false, $posY=false, $direct
 
 
 		$game['objects'][$meteor]['wrapping'] = {};
-	    $game['objects'][$meteor]['wrapping']['top'] 	= -$game['objects'][$meteor]['height'];
-	    $game['objects'][$meteor]['wrapping']['bottom']	=  $game['height']+($game['objects'][$meteor]['height']/2);
-	    $game['objects'][$meteor]['wrapping']['left'] 	=  $game['posX']-$game['objects'][$meteor]['width'];
-	    $game['objects'][$meteor]['wrapping']['right']	=  $game['width']+($game['objects'][$meteor]['width']/2);
+	    $game['objects'][$meteor]['wrapping']['top'] 	=  0;
+	    $game['objects'][$meteor]['wrapping']['bottom']	=  $game['height'];
+	    $game['objects'][$meteor]['wrapping']['left'] 	=  0;
+	    $game['objects'][$meteor]['wrapping']['right']	=  $game['width'];
+
+	    //$game['objects'][$meteor]['wrapping']['top'] 	= -$game['objects'][$meteor]['height'];
+	    //$game['objects'][$meteor]['wrapping']['bottom']	=  $game['height']+($game['objects'][$meteor]['height']/2);
+	    //$game['objects'][$meteor]['wrapping']['left'] 	=  $game['posX']-$game['objects'][$meteor]['width'];
+	    //$game['objects'][$meteor]['wrapping']['right']	=  $game['width']+($game['objects'][$meteor]['width']/2);
 
 	// Set starting speed
 		if ($speed) {
@@ -182,6 +214,26 @@ jQuery.fn.crBullet = function($bullet,$x,$y,$direction) {
 };
 
 
+jQuery.fn.crDebug = function($parent) {
+	
+	if($game['debug'] instanceof Object) {
+	} else {
+		$game['debug'] = {};
+		$game['debug']['xy_test'] = 0
+	}
+	$game['debug']['xy_test']++;
+	$obj = "#test"+$game['debug']['xy_test']
+	$game['objects'][$obj] = {};
+	$game['objects'][$obj]['x'] = $game['objects'][$parent]['x'];
+	$game['objects'][$obj]['y'] = $game['objects'][$parent]['y'];
+	//Create obj element (NOTE: replace the # so the id is correct)
+	$( "<b>" ).attr( "class", "debug" ).attr( "id",$obj.replace("#", "")).css( "left",$game['objects'][$obj]['x'] ).css( "top",$game['objects'][$obj]['y'] ).appendTo( $game['canvas'] );
+
+
+   	$().objDebug($obj,$parent);
+};
+
+
 jQuery.fn.setGameConfig = function($canvas) {	
 	$play=true;
 	$game = {};
@@ -194,7 +246,10 @@ jQuery.fn.setGameConfig = function($canvas) {
 	$game['posX']	= 0;
 	$game['posY']	= 0;
 	$game['bullet']	= 0;
-	$game['standard']['speed']	= 10;
+	$game['active_bullets']			= 0;
+	$game['standard']['speed']		= 10;
+	$game['standard']['bullets']	= 10;
+
 };
 
 
@@ -204,6 +259,33 @@ jQuery.fn.setGameConfig = function($canvas) {
 
 
 
+
+
+jQuery.fn.objDebug = function($obj,$parent) {
+    
+    $game['objects'][$obj]['move'] = true;
+    $game['objects'][$obj]['rotate'] = Math.round(Math.random()*360);
+
+
+////	START interval 	///////////////////////////////////////////////////////////
+    $game['objects'][$obj]['interval'] = setInterval(function(){    	
+
+    // Move the object
+    // 
+		$x = $game['objects'][$parent]['x'];
+		$y = $game['objects'][$parent]['y'];
+
+	    $($obj).css("left",$x);
+	    $($obj).css("top",$y);
+
+	// When a delete action is triggered, it means the object is hit.
+		if ($game['objects'][$obj]['delete']==true) {
+			$($obj).deleteObject($obj);
+		}
+    },  $game['speed']);
+////	END OF interval 	///////////////////////////////////////////////////////////
+
+};
 
 
 jQuery.fn.objMeteor = function($obj) {
@@ -222,16 +304,17 @@ jQuery.fn.objMeteor = function($obj) {
 		$game['objects'][$obj]['rotate'] ++;
 		$($obj).rotate($game['objects'][$obj]['rotate'] );
 
+
 	// When a delete action is triggered, it means the object is hit.
 		if ($game['objects'][$obj]['delete']==true) {
-    		$(document).crMeteor($obj+"-1",$game['objects'][$obj]['size']/2,$game['objects'][$obj]['x'],$game['objects'][$obj]['y'],$game['objects'][$obj]['direction']-15,$game['objects'][$obj]['speed']*0.75);
-    		$(document).crMeteor($obj+"-2",$game['objects'][$obj]['size']/2,$game['objects'][$obj]['x'],$game['objects'][$obj]['y'],$game['objects'][$obj]['direction']+15,$game['objects'][$obj]['speed']*0.75);
+			if ($game['objects'][$obj]['size'] >=5) {
+    			$(document).crMeteor($obj+"-1",$game['objects'][$obj]['size']/2,$game['objects'][$obj]['x'],$game['objects'][$obj]['y'],$game['objects'][$obj]['direction']-15,$game['objects'][$obj]['speed']*0.75);
+    			$(document).crMeteor($obj+"-2",$game['objects'][$obj]['size']/2,$game['objects'][$obj]['x'],$game['objects'][$obj]['y'],$game['objects'][$obj]['direction']+15,$game['objects'][$obj]['speed']*0.75);
+			}
 			$($obj).deleteObject($obj);
 		}
     },  $game['speed']);
 ////	END OF interval 	///////////////////////////////////////////////////////////
-
-
 
 };
 
@@ -252,12 +335,14 @@ jQuery.fn.objBullet = function($obj) {
 	   		if ($with.indexOf("meteor") == 1) {
     			if ($().collisionCheck($obj,$with)) {
     				$game['objects'][$with]['delete'] = true;
+    				$game['active_bullets']--;
     				$($obj).deleteObject($obj);
     			}
 	   		} 
 		}
 
 		if ($game['objects'][$obj]['x']<$game['posX'] || $game['objects'][$obj]['x']>$game['width'] || $game['objects'][$obj]['y']<$game['posY'] || $game['objects'][$obj]['y']>$game['height']) {
+    		$game['active_bullets']--;
 			$($obj).deleteObject($obj);
 		}
 
@@ -365,12 +450,13 @@ jQuery.fn.objSpaceship = function($obj) {
     // SPACE - fire bullet
 	$(document).keydown(function(e) {
 		if ( e.which == 32) {
-	    	$game['bullet']++;
-			$radians = $game['objects'][$obj]['direction'] * (Math.PI/180)
-			$new_y = $game['objects'][$obj]['y']+10;
-			$new_x = $game['objects'][$obj]['x']+15;
-	    	$(this).crBullet("#bullet"+$game['bullet'],$new_x,$new_y,$game['objects'][$obj]['direction']);		
-
+			if ($game['active_bullets']<=$game['standard']['bullets']) {
+		    	$game['active_bullets']++;
+		    	$game['bullet']++;
+				$new_y = $game['objects'][$obj]['y'];
+				$new_x = $game['objects'][$obj]['x'];
+		    	$(this).crBullet("#bullet"+$game['bullet'],$new_x,$new_y,$game['objects'][$obj]['direction']);		
+		    }
 	    }
 	});
     
@@ -531,14 +617,16 @@ jQuery.fn.move = function($obj) {
     //Load the general variables into a local var for better readability
     $hspeed = $game['objects'][$obj]['hspeed'];
     $vspeed = $game['objects'][$obj]['vspeed'];
+    $x_center = $game['objects'][$obj]['width']/2;
+    $y_center = $game['objects'][$obj]['height']/2;
 
 
 
     $($obj).css("top","+="+$vspeed);
     $($obj).css("left","+="+$hspeed);
 
-    $game['objects'][$obj]['x'] = parseInt($($obj).css("left").replace("px",""),0);
-    $game['objects'][$obj]['y'] = parseInt($($obj).css("top").replace("px",""),0);
+    $game['objects'][$obj]['x'] = parseInt($($obj).css("left").replace("px",""),0)+$x_center;
+    $game['objects'][$obj]['y'] = parseInt($($obj).css("top").replace("px",""),0)+$y_center;
 
 }
 
@@ -557,16 +645,16 @@ jQuery.fn.wrap = function($obj) {
     //Set the wrapping
 
     if ($game['objects'][$obj]['x']>$game['objects'][$obj]['wrapping']['right']) {
-        $($obj).css("left",$game['objects'][$obj]['wrapping']['left']);
+        $($obj).css("left",$game['objects'][$obj]['wrapping']['left']-$game['objects'][$obj]['width']/2);
     }
-    if ($game['objects'][$obj]['x']<=$game['objects'][$obj]['wrapping']['left']) {
-        $($obj).css("left",$game['objects'][$obj]['wrapping']['right']);
+    if ($game['objects'][$obj]['x']<$game['objects'][$obj]['wrapping']['left']) {
+        $($obj).css("left",$game['objects'][$obj]['wrapping']['right']-$game['objects'][$obj]['width']/2);
     }
     if ($game['objects'][$obj]['y']<$game['objects'][$obj]['wrapping']['top']) {
-        $($obj).css("top",$game['objects'][$obj]['wrapping']['bottom']);
+        $($obj).css("top",$game['objects'][$obj]['wrapping']['bottom']-$game['objects'][$obj]['height']/2);
     }
     if ($game['objects'][$obj]['y']>$game['objects'][$obj]['wrapping']['bottom']) {
-        $($obj).css("top",$game['objects'][$obj]['wrapping']['top']);
+        $($obj).css("top",$game['objects'][$obj]['wrapping']['top']-$game['objects'][$obj]['height']/2);
     }
 
 }
