@@ -32,7 +32,7 @@ jQuery.fn.crMeteor = function($meteor, $size,$posX = false, $posY=false, $direct
 	            $arr[$y][$x]=$i;
 	            $id = ($meteor+$y+$x).replace("#","");
 	             $( "<b>" ).attr( "class", $part[0].specs ).css( "left",$x*$size ).css( "top",$y*$size ).attr( "id", $id ).appendTo( $meteor );
-
+	            if ($size>15) {
 				// Adjust the border sizes
 					//Top
 				$border_top_width = $("#"+$id).css("border-top-width").replace("px","");
@@ -49,7 +49,7 @@ jQuery.fn.crMeteor = function($meteor, $size,$posX = false, $posY=false, $direct
 					//Right
 				$border_right_width = $("#"+$id).css("border-right-width").replace("px","");
 				$("#"+$id).css("border-right-width",$border_right_width/10*$size);
-
+				}
 				// [i] 10 is the standard size as mentioned in the stylesheet
 				// 
 					/*alert(
@@ -102,10 +102,6 @@ jQuery.fn.crMeteor = function($meteor, $size,$posX = false, $posY=false, $direct
 	    $game['objects'][$meteor]['wrapping']['left'] 	=  0;
 	    $game['objects'][$meteor]['wrapping']['right']	=  $game['width'];
 
-	    //$game['objects'][$meteor]['wrapping']['top'] 	= -$game['objects'][$meteor]['height'];
-	    //$game['objects'][$meteor]['wrapping']['bottom']	=  $game['height']+($game['objects'][$meteor]['height']/2);
-	    //$game['objects'][$meteor]['wrapping']['left'] 	=  $game['posX']-$game['objects'][$meteor]['width'];
-	    //$game['objects'][$meteor]['wrapping']['right']	=  $game['width']+($game['objects'][$meteor]['width']/2);
 
 	// Set starting speed
 		if ($speed) {
@@ -123,6 +119,7 @@ jQuery.fn.crMeteor = function($meteor, $size,$posX = false, $posY=false, $direct
 		} else {
 			$game['objects'][$meteor]['direction'] 	= Math.random()*360;
 		}
+
 
 		if ($posX && $posY) {
    			$(document).objMeteor($meteor);
@@ -261,12 +258,16 @@ jQuery.fn.setGameConfig = function($canvas) {
 
 
 
+
+
+
+
+
+
+
 jQuery.fn.objDebug = function($obj,$parent) {
     
-    $game['objects'][$obj]['move'] = true;
-    $game['objects'][$obj]['rotate'] = Math.round(Math.random()*360);
-
-
+	if (typeof $game['objects'][$parent] === 'object') {
 ////	START interval 	///////////////////////////////////////////////////////////
     $game['objects'][$obj]['interval'] = setInterval(function(){    	
 
@@ -278,13 +279,13 @@ jQuery.fn.objDebug = function($obj,$parent) {
 	    $($obj).css("left",$x);
 	    $($obj).css("top",$y);
 
-	// When a delete action is triggered, it means the object is hit.
-		if ($game['objects'][$obj]['delete']==true) {
+	// When a parent is deleted, delete debug as well
+		if (typeof $game['objects'][$parent] != 'object') {
 			$($obj).deleteObject($obj);
 		}
     },  $game['speed']);
 ////	END OF interval 	///////////////////////////////////////////////////////////
-
+	}
 };
 
 
@@ -302,7 +303,10 @@ jQuery.fn.objMeteor = function($obj) {
 	    $(this).move($obj);
 		$(this).direction($obj,$game['objects'][$obj]['direction']);
 		$game['objects'][$obj]['rotate'] ++;
-		$($obj).rotate($game['objects'][$obj]['rotate'] );
+		$($obj).rotate({
+			angle:$game['objects'][$obj]['rotate'],
+            center: ["50%", "50%"]
+		});
 
 
 	// When a delete action is triggered, it means the object is hit.
@@ -340,10 +344,11 @@ jQuery.fn.objBullet = function($obj) {
     			}
 	   		} 
 		}
-
-		if ($game['objects'][$obj]['x']<$game['posX'] || $game['objects'][$obj]['x']>$game['width'] || $game['objects'][$obj]['y']<$game['posY'] || $game['objects'][$obj]['y']>$game['height']) {
-    		$game['active_bullets']--;
-			$($obj).deleteObject($obj);
+		if ($game['objects'][$obj]) {
+			if ($game['objects'][$obj]['x']<$game['posX'] || $game['objects'][$obj]['x']>$game['width'] || $game['objects'][$obj]['y']<$game['posY'] || $game['objects'][$obj]['y']>$game['height']) {
+	    		$game['active_bullets']--;
+				$($obj).deleteObject($obj);
+			}
 		}
 
     },  $game['speed']);
@@ -401,7 +406,10 @@ jQuery.fn.objSpaceship = function($obj) {
 	    $(this).wrap($obj);
 	    $(this).move($obj);
 		$(this).direction($obj,$game['objects'][$obj]['direction']);
-		$($obj).rotate($game['objects'][$obj]['direction']+90);
+		$($obj).rotate({
+			angle:$game['objects'][$obj]['direction']+90,
+            center: ["50%", "50%"]
+		});
 	    
     }, $game['speed']);
 ////	END OF interval 	///////////////////////////////////////////////////////////
@@ -669,37 +677,26 @@ jQuery.fn.wrap = function($obj) {
 *  
  */
 jQuery.fn.collisionCheck = function($obj,$with) {
-    //Set the wrapping
-    
-    // Set $obj sizes 
-    var $obj_left	= $game['objects'][$obj]['x']-$game['objects'][$obj]['width']/2;
-    var $obj_right	= $game['objects'][$obj]['x']+$game['objects'][$obj]['width']/2;
-    var $obj_top 	= $game['objects'][$obj]['y']-$game['objects'][$obj]['height']/2;
-    var $obj_bottom	= $game['objects'][$obj]['y']+$game['objects'][$obj]['height']/2;
+    //Check if both objects exist
+    if ($game['objects'][$obj] && $game['objects'][$with]) {
+	    // Set $obj sizes 
+	    var $obj_left	= $game['objects'][$obj]['x']-$game['objects'][$obj]['width']/2;
+	    var $obj_right	= $game['objects'][$obj]['x']+$game['objects'][$obj]['width']/2;
+	    var $obj_top 	= $game['objects'][$obj]['y']-$game['objects'][$obj]['height']/2;
+	    var $obj_bottom	= $game['objects'][$obj]['y']+$game['objects'][$obj]['height']/2;
 
-    // Set $with sizes 
-    var $with_left	= $game['objects'][$with]['x']-$game['objects'][$with]['width']/2;
-    var $with_right = $game['objects'][$with]['x']+$game['objects'][$with]['width']/2;
-    var $with_top 	= $game['objects'][$with]['y']-$game['objects'][$with]['height']/2;
-    var $with_bottom= $game['objects'][$with]['y']+$game['objects'][$with]['height']/2;
-    
-    if ($obj_right>$with_left && $obj_left<$with_right && $obj_top<$with_bottom && $obj_bottom>$with_top) {
-       	//return "HIT!";
-       	return true;
-    } else {
-        //return ("x: "+$game['objects'][$obj]['x']+"\ny: "+$game['objects'][$obj]['y']+"\n--------------\nx: "+$game['objects'][$with]['x']+"\ny: "+$game['objects'][$with]['y'])
-        return false;
-    }
-    
-/*
-	for (var $target in $game.objects) {
-   		if (k.indexOf("meteor") == 1) {
-   			$(document).objMeteor(k);
-   		} else if (k.indexOf("spaceship") == 1) {
-   			$(document).objSpaceship(k);
-   		} else {
-   		// Systeem kent dit object niet
-   		}
-	}*/
-
+	    // Set $with sizes 
+	    var $with_left	= $game['objects'][$with]['x']-$game['objects'][$with]['width']/2;
+	    var $with_right = $game['objects'][$with]['x']+$game['objects'][$with]['width']/2;
+	    var $with_top 	= $game['objects'][$with]['y']-$game['objects'][$with]['height']/2;
+	    var $with_bottom= $game['objects'][$with]['y']+$game['objects'][$with]['height']/2;
+	    
+	    if ($obj_right>$with_left && $obj_left<$with_right && $obj_top<$with_bottom && $obj_bottom>$with_top) {
+	       	//return "HIT!";
+	       	return true;
+	    } else {
+	        //return ("x: "+$game['objects'][$obj]['x']+"\ny: "+$game['objects'][$obj]['y']+"\n--------------\nx: "+$game['objects'][$with]['x']+"\ny: "+$game['objects'][$with]['y'])
+	        return false;
+	    }
+	}
 }
