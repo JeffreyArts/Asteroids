@@ -79,22 +79,30 @@
         <b class='part h5 d2' id="s10"></b>
         <b class='part h5 d2' id="s11"></b>
     </span>-->
-    <span class="spaceship" id="spaceship"></span>
+    <!-- <span class="spaceship" id="spaceship"></span> -->
 </div>
 <div class="log"><ul></ul></div>
 
 <script>//$(".meteor").rotate(45);
 //         alert( "Hello, World!");
 
-$(document).ready(function () {
-   $(document).setGameConfig(".game");
+const startGame = function() {
+    $(".game")[0].innerHTML = ""
+    $(document).setGameConfig(".game");
+    
+    $(document).crMeteor("#meteor1",20);
+    $(document).crMeteor("#meteor2",20);
+    $(document).crSpaceship("#spaceship",10);
+    
+    $(document).runGame(".game");
+}
 
-   $(document).crMeteor("#meteor1",20);
-   $(document).crMeteor("#meteor2",20);
-   $(document).crSpaceship("#spaceship",10);
+const resizeGame = function() {
+    location.reload()
+}
 
-   $(document).runGame(".game");
-});
+window.addEventListener("resize", resizeGame)
+$(document).ready(startGame);
 
 </script>
 

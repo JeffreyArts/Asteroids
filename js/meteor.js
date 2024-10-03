@@ -137,6 +137,10 @@ jQuery.fn.crSpaceship = function($spaceship, $size) {
 
 	var $file_location = "json/meteors.json";
 
+	if (!$($spaceship).length) {
+		// Add meteor to game canvas, remove the # so the id is correct
+		 $( "<span>" ).attr("class","spaceship").attr("id",$spaceship.replace("#", "")).appendTo( $game['canvas'] );
+	}
 
 	$.getJSON( $file_location, {
 	        format: "json"
